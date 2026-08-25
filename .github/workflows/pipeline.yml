@@ -39,8 +39,8 @@ jobs:
         run: |
           WAR_FILE=$(ls *.war)
           echo "Deploying war file to tomcat"
-          curl --upload-file "$WAR_FILE" \
-          "https://${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }}@${{ secrets.TOMCAT_HOST }}/manager/text/deploy?path=/myapp&update=true"
+          curl -v --upload-file "$WAR_FILE" \
+          "http://${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }}@${{ secrets.TOMCAT_HOST }}/manager/text/deploy?path=/myapp&update=true"
           
           
           
