@@ -45,6 +45,34 @@ jobs:
           name: myapp
           path: target/*.war
 
+      - name: Install sonar-scanner cli
+        run: |
+          if [ ! -d "$HOME/sonar-scanner-cli" ]; then
+          echo "Downloading sonar-scanner cli"
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.3.0.5189-linux-x64.zip -O /tmp/sonar-scanner.zip
+          unzip /tmp/sonar-scanner.zip -d $HOME
+          mv $HOME/sonar-scanner-7.3.0.5189-linux-x64 $HOME/sonar-scanner-cli
+          fi
+          export PATH=$HOME/sonar-scanner-cli/bin:$PATH
+          sonar-scanner -v
+
+      - name: Sonarqube Analysis
+        env:
+          SONAR_HOST: ${{ secrets.SONAR_HOST }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          echo "SonarQube server URL: $SONAR_HOST"
+          curl -I $SONAR_HOST
+          mvn sonar:sonar \
+              -Dsonar.projectKey=hotstar \
+              -Dsonar.host.url=${{ secrets.SONAR_HOST }} \
+              -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          
+        
+        
+
+          
+
   deploy:
     needs: build
     runs-on: [self-hosted, linux]
