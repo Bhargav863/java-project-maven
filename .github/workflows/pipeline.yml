@@ -26,6 +26,15 @@ jobs:
                echo "Maven is already installed"
              fi
                mvn -version
+
+      - name: Cache maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
           
       - name: Build with maven
         run: mvn clean package -DskipTests
@@ -55,6 +64,9 @@ jobs:
           curl -v --upload-file "$WAR_FILE" \
           "http://${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }}@${{ secrets.TOMCAT_HOST }}/manager/text/deploy?path=/myapp&update=true"
           
+      - name: Verify deployment
+        run: |
+         curl -I http://${{ secrets.TOMCAT_HOST }}/myapp
           
           
             
